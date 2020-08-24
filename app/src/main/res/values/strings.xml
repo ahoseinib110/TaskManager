@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">Task Manager</string>
+    <string name="list_is_empty">List is Empty</string>
+    <string name="date_picker_title">Date Of Task</string>
+    <string name="time_picker_title">time Of Task</string>
+
+    <string name="task_title_hint">Enter a title for the Task.</string>
+    <string name="task_title_label">Title</string>
+    <string name="task_hint_description">Description</string>
+
+    <string name="log_in">Login</string>
+    <string name="sign_up">Sign Up</string>
+</resources>
