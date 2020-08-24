@@ -17,8 +17,8 @@ public class TaskRepository  {
 
     private TaskRepository() {
         mTasksTodo = new ArrayList<>();
-         mTasksDoing = new ArrayList<>();
-         mTasksDone = new ArrayList<>();
+        mTasksDoing = new ArrayList<>();
+        mTasksDone = new ArrayList<>();
     }
 
     public static TaskRepository getInstance() {

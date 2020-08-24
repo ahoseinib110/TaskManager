@@ -3,6 +3,7 @@ package com.example.taskmanager.fragment;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,7 +22,7 @@ import com.example.taskmanager.R;
 import com.example.taskmanager.activity.TaskManagerActivity;
 import com.example.taskmanager.model.State;
 import com.example.taskmanager.model.Task;
-import com.example.taskmanager.repository.TaskRepository;
+import com.example.taskmanager.repository.TaskDBRepository;
 
 import java.io.Serializable;
 import java.util.List;
@@ -32,7 +33,6 @@ import java.util.List;
  * create an instance of this fragment.
  */
 public class TaskListFragment extends Fragment {
-
 
     public static final String mtas = "ARG_TASK_LIST";
     // TODO: Rename parameter arguments, choose names that match
@@ -54,7 +54,7 @@ public class TaskListFragment extends Fragment {
 
     private LinearLayout mLinearLayoutEmpty;
 
-    private TaskRepository mTaskRepository;
+    private TaskDBRepository mTaskRepository;
     private TaskAdapter mTaskAdapter;
 
     List<Task> mTaskList;
@@ -84,15 +84,13 @@ public class TaskListFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         if (getArguments() != null) {
             mName = getArguments().getString(ARG_NAME);
             mTasksNumber = getArguments().getInt(ARG_TASKS_NUMBER);
             mState = (State) getArguments().getSerializable(ARG_STATE);
             mTaskList = (List<Task>) getArguments().getSerializable(ARG_TASK_LIST);
         }
-        mTaskRepository = TaskRepository.getInstance();
-
+        mTaskRepository = TaskDBRepository.getInstance(getActivity());
     }
 
 
@@ -119,6 +117,8 @@ public class TaskListFragment extends Fragment {
         return view;
     }
 
+
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -126,6 +126,7 @@ public class TaskListFragment extends Fragment {
             if (requestCode == DETAIL_PICKER_REQUEST_CODE && data != null) {
                 setVisibility();
                 updateUI();
+                Log.d("bashir","come back");
             }
         }
     }
@@ -145,11 +146,12 @@ public class TaskListFragment extends Fragment {
 
 
     private void updateUI() {
+        mTaskList = mTaskRepository.getList(mState);//getAppropriateListFromRepository();
         if (mTaskAdapter == null) {
-            mTaskList = mTaskRepository.getList(mState);//getAppropriateListFromRepository();
             mTaskAdapter = new TaskAdapter(mTaskList);
             mRecyclerViewTasks.setAdapter(mTaskAdapter);
         } else {
+            mTaskAdapter.setTaskList(mTaskList);
             mTaskAdapter.notifyDataSetChanged();
         }
     }

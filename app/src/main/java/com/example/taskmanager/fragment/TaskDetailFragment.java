@@ -22,7 +22,7 @@ import androidx.fragment.app.Fragment;
 import com.example.taskmanager.R;
 import com.example.taskmanager.model.State;
 import com.example.taskmanager.model.Task;
-import com.example.taskmanager.repository.TaskRepository;
+import com.example.taskmanager.repository.TaskDBRepository;
 import com.example.taskmanager.utils.DateUtils;
 
 import java.util.Date;
@@ -37,7 +37,7 @@ public class TaskDetailFragment extends DialogFragment {
     public static final int TIME_PICKER_REQUEST_CODE = 1;
 
     private Task mTask;
-    private TaskRepository mRepository;
+    private TaskDBRepository mRepository;
 
     private EditText mEditTextDetailTitle;
     private EditText mEditTextDetailDescription;
@@ -70,7 +70,7 @@ public class TaskDetailFragment extends DialogFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d(TAG, "onCreate");
-        mRepository = TaskRepository.getInstance();
+        mRepository = TaskDBRepository.getInstance(getActivity());
         Task task = (Task) getArguments().getSerializable(ARG_TASK);
         mTask = new Task(task.getUUID(), task.getTaskTitle(), task.getTaskDescription(), task.getTaskState(), task.getDate());
     }
@@ -235,7 +235,7 @@ public class TaskDetailFragment extends DialogFragment {
             @Override
             public void onClick(View v) {
                 //Log.d("bashir","size be " +mRepository.getList(mTask.getTaskState()).size());
-                mRepository.remove(mTask);
+                ////mRepository.remove(mTask);
                 //Log.d("bashir","size af " +mRepository.getList(mTask.getTaskState()).size());
                 setResult();
                 dismiss();

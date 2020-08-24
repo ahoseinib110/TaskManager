@@ -15,7 +15,7 @@ import androidx.viewpager2.widget.ViewPager2;
 import com.example.taskmanager.R;
 import com.example.taskmanager.fragment.TaskListFragment;
 import com.example.taskmanager.model.State;
-import com.example.taskmanager.repository.TaskRepository;
+import com.example.taskmanager.repository.TaskDBRepository;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
@@ -31,7 +31,7 @@ public class TaskManagerActivity extends AppCompatActivity {
     public static final String EXTRA_NAME = "org.maktab.taskmanager.activity.taskName";
     public static final String EXTRA_NUMBER = "org.maktab.taskmanager.activity.taskNumber";
     private int mTasksNumber;
-    private TaskRepository mTaskRepository;
+    private TaskDBRepository mTaskRepository;
     private String mName;
     private ViewPagerTaskAdadapter mViewPagerTaskAdapter;
 
@@ -47,10 +47,10 @@ public class TaskManagerActivity extends AppCompatActivity {
         mName = intent.getStringExtra(EXTRA_NAME);
         mTasksNumber = intent.getIntExtra(EXTRA_NUMBER, 0);
         mViewPagerTaskAdapter = new ViewPagerTaskAdadapter(this);
-        mTaskRepository = TaskRepository.getInstance();
-        if (mTaskRepository.getList(State.TODO).size() == 0 && mTaskRepository.getList(State.DOING).size() == 0 && mTaskRepository.getList(State.DONE).size() == 0) {
-            mTaskRepository.createRandomTaskList(mTasksNumber, mName);
-        }
+        mTaskRepository = TaskDBRepository.getInstance(this);
+        //if (mTaskRepository.getList(State.TODO).size() == 0 && mTaskRepository.getList(State.DOING).size() == 0 && mTaskRepository.getList(State.DONE).size() == 0) {
+        //    mTaskRepository.createRandomTaskList(mTasksNumber, mName);
+        //}
         mViewPagerTask.setAdapter(mViewPagerTaskAdapter);
 
         new TabLayoutMediator(mTabLayout, mViewPagerTask,
@@ -120,7 +120,7 @@ public class TaskManagerActivity extends AppCompatActivity {
             String name = mName;
             int number;
             State state = getSate(position);
-            number = mTaskRepository.getList(state).size();
+            number = 0 ; //mTaskRepository.getList(state).size();
             TaskListFragment taskListFragment = TaskListFragment.newInstance(name, number, state);
             return taskListFragment;
         }
