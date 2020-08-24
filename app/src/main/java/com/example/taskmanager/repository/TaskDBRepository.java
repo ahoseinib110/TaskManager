@@ -17,18 +17,22 @@ import com.example.taskmanager.model.Task;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TaskDBRepository {//{implements IRepository<Task> {
+public class TaskDBRepository {
+    public static final String TAG = "bashir_TDBR";
     private static TaskDBRepository sTaskRepository;
     private static Context mContext;
     private SQLiteDatabase mDatabase;
     private List<Task> mTasksTodo;
     private List<Task> mTasksDoing;
     private List<Task> mTasksDone;
+    private static int mUserId ;
 
-    public static TaskDBRepository getInstance(Context context) {
+    public static TaskDBRepository getInstance(Context context,int userId) {
         mContext = context.getApplicationContext();
-        if (sTaskRepository == null)
+        if (sTaskRepository == null || userId!=mUserId) {
+            mUserId=userId;
             sTaskRepository = new TaskDBRepository();
+        }
         return sTaskRepository;
     }
 
@@ -42,6 +46,7 @@ public class TaskDBRepository {//{implements IRepository<Task> {
 
     //Read all
     public List<Task> getList(State state) {
+        Log.d(TAG,"userID " +mUserId);
         switch (state) {
             case TODO:
                 return mTasksTodo;
@@ -55,9 +60,10 @@ public class TaskDBRepository {//{implements IRepository<Task> {
 
     private List<Task> getListFromDatabase(State state) {
         List<Task> tasks = new ArrayList<>();
-        String selection = TaskDBSchema.TaskTable.COLS.STATE + "=?";
-        String[] selectionArgs = new String[]{state.toString()};
+        String selection = TaskDBSchema.TaskTable.COLS.STATE + "=? and "+TaskDBSchema.TaskTable.COLS.USER_ID+"=?";
+        String[] selectionArgs = new String[]{state.toString(),String.valueOf(mUserId)};
         TaskCursorWrapper cursor = queryTasks(selection, selectionArgs);
+
         if (cursor == null || cursor.getCount() == 0) {
             return new ArrayList<>();
         }
@@ -82,9 +88,8 @@ public class TaskDBRepository {//{implements IRepository<Task> {
 
 
     public Task get(Task task) {
-        String selection = TaskDBSchema.TaskTable.COLS.UUID + "=?";
-        String[] selectionArgs = new String[]{task.getUUID().toString()};
-
+        String selection = TaskDBSchema.TaskTable.COLS.UUID + "=? and "+TaskDBSchema.TaskTable.COLS.USER_ID+"=?";
+        String[] selectionArgs = new String[]{task.getUUID().toString(),String.valueOf(mUserId)};
         TaskCursorWrapper cursor = queryTasks(selection, selectionArgs);
         if (cursor == null || cursor.getCount() == 0)
             return null;
@@ -112,8 +117,9 @@ public class TaskDBRepository {//{implements IRepository<Task> {
     //Update one
     public void update(Task task) {
         ContentValues values = getTaskContentValue(task);
-        String where = TaskDBSchema.TaskTable.COLS.UUID + "=?";
-        String[] whereArgs = new String[]{task.getUUID().toString()};
+        String where = TaskDBSchema.TaskTable.COLS.UUID + "=? and "+TaskDBSchema.TaskTable.COLS.USER_ID+"=?";
+        String[] whereArgs = new String[]{task.getUUID().toString(),String.valueOf(mUserId)};
+        
         Task task1 = get(task);
         if (task1 == null) {
             mDatabase.insert(TaskDBSchema.TaskTable.NAME, null, values);
@@ -123,7 +129,6 @@ public class TaskDBRepository {//{implements IRepository<Task> {
         mTasksTodo = getListFromDatabase(State.TODO);
         mTasksDoing = getListFromDatabase(State.DOING);
         mTasksDone = getListFromDatabase(State.DONE);
-        Log.d("bashir", "list size " + mTasksTodo.size() + "  " + mTasksDoing.size() + "  " + mTasksDone.size());
     }
 
 
@@ -168,6 +173,7 @@ public class TaskDBRepository {//{implements IRepository<Task> {
 
     private ContentValues getTaskContentValue(Task task) {
         ContentValues values = new ContentValues();
+        values.put(TaskDBSchema.TaskTable.COLS.USER_ID,String.valueOf(task.getUserId()));
         values.put(TaskDBSchema.TaskTable.COLS.UUID, task.getUUID().toString());
         values.put(TaskDBSchema.TaskTable.COLS.TITLE, task.getTaskTitle());
         values.put(TaskDBSchema.TaskTable.COLS.DESCRIPTION, task.getTaskDescription());

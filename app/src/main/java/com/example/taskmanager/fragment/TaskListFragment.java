@@ -33,22 +33,20 @@ import java.util.List;
  * create an instance of this fragment.
  */
 public class TaskListFragment extends Fragment {
-
+    public static final String TAG = "bashir_TLF";
     public static final String mtas = "ARG_TASK_LIST";
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_NAME = "name";
-    private static final String ARG_TASKS_NUMBER = "tasksNumber";
     private static final String ARG_STATE = "state";
+    private static final String ARG_USER_ID = "user_id";
     public static final String ARG_TASK_LIST = "ARG_TASK_LIST";
 
     public static final int DETAIL_PICKER_REQUEST_CODE = 0;
     public static final String DIALOG_FRAGMENT_TAG = "tagDialog";
 
     // TODO: Rename and change types of parameters
-    private String mName;
-    private int mTasksNumber;
     private State mState;
+    private int mUserId;
 
     private RecyclerView mRecyclerViewTasks;
 
@@ -57,10 +55,17 @@ public class TaskListFragment extends Fragment {
     private TaskDBRepository mTaskRepository;
     private TaskAdapter mTaskAdapter;
 
+    private boolean mIsFABClicked = false;
+
     List<Task> mTaskList;
 
     public TaskListFragment() {
         // Required empty public constructor
+    }
+
+
+    public void setFABClicked() {
+        mIsFABClicked = true;
     }
 
     /**
@@ -70,27 +75,25 @@ public class TaskListFragment extends Fragment {
      * @return A new instance of fragment TaskListFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static TaskListFragment newInstance(String name, int tasksNumber, State state) {
+    public static TaskListFragment newInstance(int userId, State state) {
         TaskListFragment fragment = new TaskListFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_NAME, name);
-        args.putInt(ARG_TASKS_NUMBER, tasksNumber);
         args.putSerializable(ARG_STATE, state);
-        //Log.d("TLF_BASHIR", name + " " + tasksNumber);
+        args.putInt(ARG_USER_ID, userId);
         fragment.setArguments(args);
         return fragment;
     }
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mName = getArguments().getString(ARG_NAME);
-            mTasksNumber = getArguments().getInt(ARG_TASKS_NUMBER);
             mState = (State) getArguments().getSerializable(ARG_STATE);
+            mUserId = getArguments().getInt(ARG_USER_ID);
             mTaskList = (List<Task>) getArguments().getSerializable(ARG_TASK_LIST);
+            mTaskRepository = TaskDBRepository.getInstance(getActivity(), mUserId);
         }
-        mTaskRepository = TaskDBRepository.getInstance(getActivity());
     }
 
 
@@ -99,16 +102,17 @@ public class TaskListFragment extends Fragment {
         // Inflate the layout for this fragment
         TaskManagerActivity taskManagerActivity = (TaskManagerActivity) getActivity();
 
-        taskManagerActivity.mFABAdd.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Task task = new Task("", State.TODO);
-                //mTaskRepository.insert(task);
-                TaskDetailFragment taskDetailFragment = TaskDetailFragment.newInstance(task);
-                taskDetailFragment.setTargetFragment(TaskListFragment.this, DETAIL_PICKER_REQUEST_CODE);
-                taskDetailFragment.show(getFragmentManager(), DIALOG_FRAGMENT_TAG);
-            }
-        });
+        //taskManagerActivity.mFABAdd.setOnClickListener(new View.OnClickListener() {
+        //    @Override
+        //    public void onClick(View v) {
+        //        Task task = new Task(mUserId, "", State.TODO);
+        //        //mTaskRepository.insert(task);
+        //        Log.d(TAG,mState.toString());
+        //        TaskDetailFragment taskDetailFragment = TaskDetailFragment.newInstance(task);
+        //        taskDetailFragment.setTargetFragment(TaskListFragment.this, DETAIL_PICKER_REQUEST_CODE);
+        //        taskDetailFragment.show(getFragmentManager(), DIALOG_FRAGMENT_TAG);
+        //    }
+        //});
 
         View view = inflater.inflate(R.layout.fragment_task_list, container, false);
         findViews(view);
@@ -118,7 +122,6 @@ public class TaskListFragment extends Fragment {
     }
 
 
-
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -126,7 +129,6 @@ public class TaskListFragment extends Fragment {
             if (requestCode == DETAIL_PICKER_REQUEST_CODE && data != null) {
                 setVisibility();
                 updateUI();
-                Log.d("bashir","come back");
             }
         }
     }
@@ -156,8 +158,17 @@ public class TaskListFragment extends Fragment {
         }
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        if(mRecyclerViewTasks!=null && mIsFABClicked){
+            updateUI();
+            mIsFABClicked=false;
+        }
+    }
 
-    //private List<Task> getAppropriateListFromRepository() {
+    //because update ui is heavy process we set a flag to on this feature in onResume
+//private List<Task> getAppropriateListFromRepository() {
     //    List<Task> taskList = new ArrayList<>();
     //    List<Task> tempList = mTaskRepository.getList();
     //    mTasksNumber = 0;
@@ -208,6 +219,7 @@ public class TaskListFragment extends Fragment {
             return mTaskList.size();
         }
     }
+
     private void setVisibility() {
         if (mTaskList.size() > 0) {
             mRecyclerViewTasks.setVisibility(View.VISIBLE);
@@ -217,6 +229,7 @@ public class TaskListFragment extends Fragment {
             mLinearLayoutEmpty.setVisibility(View.VISIBLE);
         }
     }
+
     private class TaskViewHolder extends RecyclerView.ViewHolder {
         private TextView mTextViewName;
         private TextView mTextViewDate;

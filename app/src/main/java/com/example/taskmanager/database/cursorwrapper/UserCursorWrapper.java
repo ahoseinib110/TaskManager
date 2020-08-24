@@ -17,13 +17,11 @@ public class UserCursorWrapper extends CursorWrapper {
         if(getWrappedCursor() == null){
          Log.d("bashir","nulll");
         }
-        int index1 = getColumnIndex(TaskDBSchema.UserTable.COLS.USER_NAME);
-        int index2 = getColumnIndex(TaskDBSchema.UserTable.COLS.PASSWORD);
-        Log.d("bashir",index1+"");
-        Log.d("bashir",index2+"");
+        int userId = getInt(getColumnIndex(TaskDBSchema.UserTable.COLS.ID));
         String userName = getString(getColumnIndex(TaskDBSchema.UserTable.COLS.USER_NAME));
         String password = getString(getColumnIndex(TaskDBSchema.UserTable.COLS.PASSWORD));
         User user = new User(userName,password);
+        user.setUserId(userId);
         return user;
     }
 }

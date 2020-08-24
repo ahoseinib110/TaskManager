@@ -97,13 +97,13 @@ public class TaskRepository  {
         return null;
     }
 
-    public void createRandomTaskList(int listSize, String title) {
-        for (int i = 0; i < listSize; i++) {
-            State randomState = getRandomState();
-            Task task = new Task(title, randomState);
-            getList(randomState).add(task);
-        }
-    }
+    //public void createRandomTaskList(int listSize, String title) {
+    //    for (int i = 0; i < listSize; i++) {
+    //        State randomState = getRandomState();
+    //        Task task = new Task(title, randomState);
+    //        getList(randomState).add(task);
+    //    }
+    //}
 
 
     public static State getRandomState() {

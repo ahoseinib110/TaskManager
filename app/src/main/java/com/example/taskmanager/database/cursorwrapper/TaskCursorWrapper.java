@@ -23,6 +23,7 @@ public class TaskCursorWrapper extends CursorWrapper {
     }
 
     public Task getTask() {
+        int userId = getInt(getColumnIndex(TaskDBSchema.TaskTable.COLS.USER_ID));
         String stringUUID = getString(getColumnIndex(TaskDBSchema.TaskTable.COLS.UUID));
         String title = getString(getColumnIndex(TaskDBSchema.TaskTable.COLS.TITLE));
         String description = getString(getColumnIndex(TaskDBSchema.TaskTable.COLS.DESCRIPTION));
@@ -30,7 +31,7 @@ public class TaskCursorWrapper extends CursorWrapper {
         State state = State.valueOf(getString(getColumnIndex(TaskDBSchema.TaskTable.COLS.STATE)));
 
 
-        Task task = new Task(UUID.fromString(stringUUID), title,description,state, date);
+        Task task = new Task(userId,UUID.fromString(stringUUID), title,description,state, date);
         return task;
     }
 }

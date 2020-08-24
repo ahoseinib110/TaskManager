@@ -9,6 +9,7 @@ public class TaskDBSchema {
 
         public static final class COLS {
             public static final String ID = "id";
+            public static final String USER_ID = "user_id";
             public static final String UUID = "uuid";
             public static final String TITLE = "title";
             public static final String DATE = "date";

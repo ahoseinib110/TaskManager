@@ -3,6 +3,7 @@ package com.example.taskmanager.activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.PersistableBundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -22,6 +23,7 @@ public class LoginActivity extends AppCompatActivity {
     public static final String KEY_USER_NAME = "userName";
     public static final String KEY_PASSWORD = "password";
     public static final int REQUEST_CODE_SIGN_UP = 0;
+    public static final String TAG = "bashir_LA";
     private EditText mEditTextUserName;
     private EditText mEditTextPassword;
     private Button mButtonLogin;
@@ -76,7 +78,7 @@ public class LoginActivity extends AppCompatActivity {
                     if (user != null) {
                         if (Integer.parseInt(user.getPassword()) == Integer.parseInt(password)) {
                             Toast.makeText(LoginActivity.this, "correct", Toast.LENGTH_SHORT).show();
-                            Intent intent = TaskManagerActivity.newIntent(LoginActivity.this,"",0);
+                            Intent intent = TaskManagerActivity.newIntent(LoginActivity.this,user.getUserId());
                             startActivity(intent);
                         } else {
                             Toast.makeText(LoginActivity.this, "user name or password is incorrect!", Toast.LENGTH_SHORT).show();

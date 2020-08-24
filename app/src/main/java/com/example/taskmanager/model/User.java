@@ -6,7 +6,7 @@ public class User implements Serializable {
 
     private String mUserName;
     private String mPassword;
-
+    private int mUserId;
 
 
     public String getUserName() {
@@ -25,7 +25,15 @@ public class User implements Serializable {
         mPassword = password;
     }
 
-    public User(String userName, String password) {
+    public int getUserId() {
+        return mUserId;
+    }
+
+    public void setUserId(int userId) {
+        mUserId = userId;
+    }
+
+    public User( String userName, String password) {
         mUserName = userName;
         mPassword = password;
     }

@@ -66,11 +66,11 @@ public class TaskFragment extends Fragment {
         mButtonCreateTasks.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = TaskManagerActivity.newIntent(getActivity()
-                        , String.valueOf(mEditTextUserName.getText())
-                        , Integer.parseInt(String.valueOf(mEditTextTaskNumber.getText())));
-                getActivity().startActivity(intent);
-            }
+               // Intent intent = TaskManagerActivity.newIntent(getActivity()
+               //         , String.valueOf(mEditTextUserName.getText())
+               //         , Integer.parseInt(String.valueOf(mEditTextTaskNumber.getText())));
+               // getActivity().startActivity(intent);
+             }
         });
     }
 

@@ -1,6 +1,7 @@
 package com.example.taskmanager.fragment;
 
 import android.app.Activity;
+import android.app.FragmentManager;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -29,7 +30,7 @@ import java.util.Date;
 
 public class TaskDetailFragment extends DialogFragment {
 
-    public static final String TAG = "CDF";
+    public static final String TAG = "bashir_TDF";
     public static final String BUNDLE_TASK = "task";
     public static final String ARG_TASK = "TaskArg";
     public static final String DIALOG_FRAGMENT_TAG = "Dialog";
@@ -69,17 +70,14 @@ public class TaskDetailFragment extends DialogFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d(TAG, "onCreate");
-        mRepository = TaskDBRepository.getInstance(getActivity());
         Task task = (Task) getArguments().getSerializable(ARG_TASK);
-        mTask = new Task(task.getUUID(), task.getTaskTitle(), task.getTaskDescription(), task.getTaskState(), task.getDate());
+        mRepository = TaskDBRepository.getInstance(getActivity(),task.getUserId());
+        mTask = new Task(task.getUserId(),task.getUUID(), task.getTaskTitle(), task.getTaskDescription(), task.getTaskState(), task.getDate());
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        Log.d(TAG, "onCreateView");
-
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_task_detail, container, false);
 
@@ -310,6 +308,8 @@ public class TaskDetailFragment extends DialogFragment {
             mButtonDetailTime.setText(DateUtils.getTimeWithoutDate(mTask.getDate()));
         }
     }
+
+
 
     /*void onResultFromDatePicker(Date userPickedDate) {
         mCrime.setDate(userPickedDate);

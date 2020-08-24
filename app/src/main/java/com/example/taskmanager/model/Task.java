@@ -10,19 +10,21 @@ public class Task implements Serializable {
     private UUID mUUID;
     private String mTaskDescription;
     private Date mDate;
+    private int mUserId;
 
 
-    public Task(String taskTitle, State taskState) {
-        this(UUID.randomUUID(),taskTitle,"", taskState,new Date());
+    public Task(int userId,String taskTitle, State taskState) {
+        this(userId,UUID.randomUUID(),taskTitle,"", taskState,new Date());
     }
 
 
-    public Task(UUID id, String taskTitle, String taskDescription, State taskState, Date date) {
+    public Task(int userId,UUID id, String taskTitle, String taskDescription, State taskState, Date date) {
         mUUID = id;
         mTaskTitle = taskTitle;
         mTaskDescription=taskDescription;
         mTaskState = taskState;
         mDate = date;
+        mUserId=userId;
     }
 
     public String getTaskTitle() {
@@ -63,5 +65,13 @@ public class Task implements Serializable {
 
     public void setDate(Date date) {
         mDate = date;
+    }
+
+    public int getUserId() {
+        return mUserId;
+    }
+
+    public void setUserId(int userId) {
+        mUserId = userId;
     }
 }
