@@ -1,25 +1,39 @@
 package com.example.taskmanager.model;
 
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
+
 import java.io.Serializable;
 import java.util.Date;
 import java.util.UUID;
 
+@Entity(tableName = "TaskTable")
 public class Task implements Serializable {
-    private String mTaskTitle;
-    private State mTaskState;
-    private UUID mUUID;
-    private String mTaskDescription;
-    private Date mDate;
+    @ColumnInfo(name = "id")
+    @PrimaryKey(autoGenerate = true)
+    private int mId;
+    @ColumnInfo(name = "userId")
     private int mUserId;
+    @ColumnInfo(name = "title")
+    private String mTaskTitle;
+    @ColumnInfo(name = "state")
+    private State mTaskState;
+    @ColumnInfo(name = "taskDescription")
+    private String mTaskDescription;
+    @ColumnInfo(name = "date")
+    private Date mDate;
 
 
-    public Task(int userId,String taskTitle, State taskState) {
-        this(userId,UUID.randomUUID(),taskTitle,"", taskState,new Date());
+    public Task(){
+
     }
 
+    public Task(int userId,String taskTitle, State taskState) {
+        this(userId,taskTitle,"", taskState,new Date());
+    }
 
-    public Task(int userId,UUID id, String taskTitle, String taskDescription, State taskState, Date date) {
-        mUUID = id;
+    public Task(int userId, String taskTitle, String taskDescription, State taskState, Date date) {
         mTaskTitle = taskTitle;
         mTaskDescription=taskDescription;
         mTaskState = taskState;
@@ -43,12 +57,12 @@ public class Task implements Serializable {
         mTaskState = taskState;
     }
 
-    public UUID getUUID() {
-        return mUUID;
+    public int getId() {
+        return mId;
     }
 
-    public void setUUID(UUID UUID) {
-        mUUID = UUID;
+    public void setId(int id) {
+        mId = id;
     }
 
     public String getTaskDescription() {
