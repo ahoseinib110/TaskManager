@@ -70,9 +70,8 @@ public class TaskDetailFragment extends DialogFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Task task = (Task) getArguments().getSerializable(ARG_TASK);
-        mRepository = TaskDBRepository.getInstance(getActivity(),task.getUserId());
-        mTask = new Task(task.getUserId(),task.getUUID(), task.getTaskTitle(), task.getTaskDescription(), task.getTaskState(), task.getDate());
+        mTask = (Task) getArguments().getSerializable(ARG_TASK);
+        mRepository = TaskDBRepository.getInstance(getActivity(),mTask.getUserId());
     }
 
     @Override
@@ -88,29 +87,6 @@ public class TaskDetailFragment extends DialogFragment {
         return view;
     }
 
-    //@NonNull
-    //@Override
-    //public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
-    //    LayoutInflater inflater = LayoutInflater.from(getActivity());
-    //    View view = inflater.inflate(R.layout.fragment_task_detail, null);
-
-    //    findViews(view);
-    //    initDatePicker();
-
-    //    return new AlertDialog.Builder(getActivity())
-    //            .setTitle(R.string.date_picker_title)
-    //            .setIcon(R.mipmap.ic_launcher)
-    //            .setView(view)
-    //            .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-    //                @Override
-    //                public void onClick(DialogInterface dialogInterface, int i) {
-    //                    Date datePicked = getSelectedDateFromDatePicker();
-    //                    setResult(datePicked);
-    //                }
-    //            })
-    //            .setNegativeButton(android.R.string.cancel, null)
-    //            .create();
-    //}
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
@@ -177,30 +153,6 @@ public class TaskDetailFragment extends DialogFragment {
     }
 
     private void setListeners() {
-        //    mEditTextCrimeTitle.addTextChangedListener(new TextWatcher() {
-        //        @Override
-        //        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-        //        }
-
-        //        @Override
-        //        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-        //            mCrime.setTitle(charSequence.toString());
-        //            Log.d(TAG, mCrime.toString());
-        //        }
-
-        //        @Override
-        //        public void afterTextChanged(Editable editable) {
-
-        //        }
-        //    });
-        //    mCheckBoxSolved.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-        //        @Override
-        //        public void onCheckedChanged(CompoundButton compoundButton, boolean checked) {
-        //            mCrime.setSolved(checked);
-        //            Log.d(TAG, mCrime.toString());
-        //        }
-        //    });
 
         mButtonDetailDate.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -232,9 +184,7 @@ public class TaskDetailFragment extends DialogFragment {
         mTextViewDetailDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //Log.d("bashir","size be " +mRepository.getList(mTask.getTaskState()).size());
-                ////mRepository.remove(mTask);
-                //Log.d("bashir","size af " +mRepository.getList(mTask.getTaskState()).size());
+                mRepository.delete(mTask);
                 setResult();
                 dismiss();
             }
@@ -273,8 +223,12 @@ public class TaskDetailFragment extends DialogFragment {
                 }
                 mTask.setTaskTitle(String.valueOf(mEditTextDetailTitle.getText()));
                 mTask.setTaskDescription(String.valueOf(mEditTextDetailDescription.getText()));
-                //Log.d("bashir","size be add  " +mRepository.getList(mTask.getTaskState()).size());
-                updateTask();
+
+                if(mTextViewDetailEdit.getVisibility()==View.GONE || mTextViewDetailEdit.getVisibility()==View.INVISIBLE){
+                    mRepository.insert(mTask);
+                }else {
+                    mRepository.update(mTask);
+                }
                 //Log.d("bashir","size af add  " +mRepository.getList(mTask.getTaskState()).size());
                 setResult();
                 dismiss();
@@ -289,9 +243,7 @@ public class TaskDetailFragment extends DialogFragment {
         fragment.onActivityResult(getTargetRequestCode(), Activity.RESULT_OK, intent);
     }
 
-    private void updateTask() {
-        mRepository.update(mTask);
-    }
+
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {

@@ -2,6 +2,7 @@ package com.example.taskmanager.model;
 
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 import java.io.Serializable;
@@ -16,13 +17,14 @@ public class User implements Serializable {
     @ColumnInfo(name = "password")
     private String mPassword;
 
+    public User() {
+
+    }
+
+    @Ignore
     public User(String userName, String password) {
         mUserName = userName;
         mPassword = password;
-    }
-
-    public User() {
-
     }
 
 

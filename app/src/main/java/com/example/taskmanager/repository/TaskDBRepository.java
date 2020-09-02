@@ -2,6 +2,7 @@ package com.example.taskmanager.repository;
 
 
 import android.content.Context;
+import android.util.Log;
 
 import androidx.room.Room;
 
@@ -34,13 +35,22 @@ public class TaskDBRepository {
     }
 
 
-    private List<Task> getList(State state, int userId) {
-        return mTaskDB.taskDao().getList(state, userId);
+    public List<Task> getList(State state, int userId) {
+        if(mTaskDB.userDao().getUserName(userId).equals("admin")){
+            return mTaskDB.taskDao().getListAdmin(state);
+        }else {
+            return mTaskDB.taskDao().getList(state, userId);
+        }
     }
 
 
     public Task get(Task task) {
-        return mTaskDB.taskDao().get(task.getId(), task.getUserId());
+        if(mTaskDB.userDao().getUserName(task.getUserId()).equals("admin")){
+            return mTaskDB.taskDao().getAdmin(task.getId());
+        }else {
+            return mTaskDB.taskDao().get(task.getId(), task.getUserId());
+        }
+
     }
 
 
@@ -51,6 +61,7 @@ public class TaskDBRepository {
 
     //Delete
     public void delete(Task task) {
+        Log.d(TAG,task.toString());
         mTaskDB.taskDao().delete(task);
     }
 

@@ -2,7 +2,9 @@ package com.example.taskmanager.model;
 
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
+import androidx.room.TypeConverter;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -29,10 +31,12 @@ public class Task implements Serializable {
 
     }
 
+    @Ignore
     public Task(int userId,String taskTitle, State taskState) {
         this(userId,taskTitle,"", taskState,new Date());
     }
 
+    @Ignore
     public Task(int userId, String taskTitle, String taskDescription, State taskState, Date date) {
         mTaskTitle = taskTitle;
         mTaskDescription=taskDescription;
@@ -87,5 +91,41 @@ public class Task implements Serializable {
 
     public void setUserId(int userId) {
         mUserId = userId;
+    }
+
+    @Override
+    public String toString() {
+        return "Task{" +
+                "mId=" + mId +
+                ", mUserId=" + mUserId +
+                ", mTaskTitle='" + mTaskTitle + '\'' +
+                ", mTaskState=" + mTaskState +
+                ", mTaskDescription='" + mTaskDescription + '\'' +
+                ", mDate=" + mDate +
+                '}';
+    }
+
+    public static class StateConverter {
+        @TypeConverter
+        public String stateToString(State state) {
+            return state == null ? null : state.toString();
+        }
+
+        @TypeConverter
+        public State stringToState(String value) {
+            return value == null ? null : State.valueOf(value);
+        }
+    }
+
+    public static class DateConverter {
+        @TypeConverter
+        public Long dateToTimeStamp(Date date) {
+            return date == null ? null : date.getTime();
+        }
+
+        @TypeConverter
+        public Date fromTimeStamp(Long value) {
+            return value == null ? null : new Date(value);
+        }
     }
 }

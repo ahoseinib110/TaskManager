@@ -55,7 +55,6 @@ public class TaskListFragment extends Fragment {
     private TaskDBRepository mTaskRepository;
     private TaskAdapter mTaskAdapter;
 
-    private boolean mIsFABClicked = false;
 
     List<Task> mTaskList;
 
@@ -65,7 +64,7 @@ public class TaskListFragment extends Fragment {
 
 
     public void setFABClicked() {
-        mIsFABClicked = true;
+
     }
 
     /**
@@ -127,7 +126,7 @@ public class TaskListFragment extends Fragment {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == Activity.RESULT_OK) {
             if (requestCode == DETAIL_PICKER_REQUEST_CODE && data != null) {
-                setVisibility();
+
                 updateUI();
             }
         }
@@ -148,22 +147,24 @@ public class TaskListFragment extends Fragment {
 
 
     private void updateUI() {
-        mTaskList = mTaskRepository.getList(mState);//getAppropriateListFromRepository();
+        mTaskList = mTaskRepository.getList(mState,mUserId);//getAppropriateListFromRepository();
+        Log.d(TAG,mState+" "+mUserId);
         if (mTaskAdapter == null) {
             mTaskAdapter = new TaskAdapter(mTaskList);
             mRecyclerViewTasks.setAdapter(mTaskAdapter);
         } else {
+            Log.d(TAG,"salam");
             mTaskAdapter.setTaskList(mTaskList);
             mTaskAdapter.notifyDataSetChanged();
         }
+        setVisibility();
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        if(mRecyclerViewTasks!=null && mIsFABClicked){
+        if(mRecyclerViewTasks!=null){
             updateUI();
-            mIsFABClicked=false;
         }
     }
 
@@ -211,7 +212,7 @@ public class TaskListFragment extends Fragment {
             Task task = mTaskList.get(position);
             boolean isOdd = (position % 2 != 0);
             holder.onBind(task, isOdd);
-            setVisibility();
+            //setVisibility();
         }
 
         @Override

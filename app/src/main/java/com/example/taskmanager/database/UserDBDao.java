@@ -16,6 +16,9 @@ public interface UserDBDao {
     @Query("select * from userTable where userName=:userName")
     public User get(String userName);
 
+    @Query("select userName from userTable where id=:userId")
+    public String getUserName(int userId);
+
     @Update
     public void update(User user);
 

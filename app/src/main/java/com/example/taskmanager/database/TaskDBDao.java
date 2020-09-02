@@ -20,6 +20,12 @@ public interface TaskDBDao {
     @Query("select * from tasktable where id=:id and userId=:userId")
     public Task get(int id, int userId);
 
+    @Query("Select * From tasktable where state=:state")
+    public List<Task> getListAdmin(State state);
+
+    @Query("select * from tasktable where id=:id")
+    public Task getAdmin(int id);
+
     @Update
     public void update(Task task);
 
@@ -28,4 +34,5 @@ public interface TaskDBDao {
 
     @Delete
     public void delete(Task task);
+
 }
