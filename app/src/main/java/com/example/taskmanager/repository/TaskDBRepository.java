@@ -8,7 +8,11 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 
+import androidx.room.Room;
+import androidx.room.RoomDatabase;
+
 import com.example.taskmanager.database.TaskBaseHelper;
+import com.example.taskmanager.database.TaskDB;
 import com.example.taskmanager.database.TaskDBSchema;
 import com.example.taskmanager.database.cursorwrapper.TaskCursorWrapper;
 import com.example.taskmanager.model.State;
@@ -21,165 +25,48 @@ public class TaskDBRepository {
     public static final String TAG = "bashir_TDBR";
     private static TaskDBRepository sTaskRepository;
     private static Context mContext;
-    private SQLiteDatabase mDatabase;
-    private List<Task> mTasksTodo;
-    private List<Task> mTasksDoing;
-    private List<Task> mTasksDone;
-    private static int mUserId ;
+    private static int mUserId;
+    private TaskDB mTaskDB;
 
-    public static TaskDBRepository getInstance(Context context,int userId) {
+    public static TaskDBRepository getInstance(Context context, int userId) {
+        mUserId = userId;
         mContext = context.getApplicationContext();
-        if (sTaskRepository == null || userId!=mUserId) {
-            mUserId=userId;
+        if (sTaskRepository == null) {
             sTaskRepository = new TaskDBRepository();
         }
         return sTaskRepository;
     }
 
     private TaskDBRepository() {
-        TaskBaseHelper taskBaseHelper = new TaskBaseHelper(mContext);
-        mDatabase = taskBaseHelper.getWritableDatabase();
-        mTasksTodo = getListFromDatabase(State.TODO);
-        mTasksDoing = getListFromDatabase(State.DOING);
-        mTasksDone = getListFromDatabase(State.DONE);
-    }
-
-    //Read all
-    public List<Task> getList(State state) {
-        Log.d(TAG,"userID " +mUserId);
-        switch (state) {
-            case TODO:
-                return mTasksTodo;
-            case DOING:
-                return mTasksDoing;
-            case DONE:
-                return mTasksDone;
-        }
-        return null;
-    }
-
-    private List<Task> getListFromDatabase(State state) {
-        List<Task> tasks = new ArrayList<>();
-        String selection = TaskDBSchema.TaskTable.COLS.STATE + "=? and "+TaskDBSchema.TaskTable.COLS.USER_ID+"=?";
-        String[] selectionArgs = new String[]{state.toString(),String.valueOf(mUserId)};
-        TaskCursorWrapper cursor = queryTasks(selection, selectionArgs);
-
-        if (cursor == null || cursor.getCount() == 0) {
-            return new ArrayList<>();
-        }
-        try {
-            cursor.moveToFirst();
-            while (!cursor.isAfterLast()) {
-                tasks.add(cursor.getTask());
-                cursor.moveToNext();
-            }
-        } finally {
-            cursor.close();
-        }
-        return tasks;
+        mTaskDB = Room.databaseBuilder(mContext, TaskDB.class, "TaskDB.db")
+                .allowMainThreadQueries()
+                .build();
     }
 
 
-/*
-    /*@Override
-    public void setList(List<Crime> crimes) {
-        mCrimes = crimes;
-    }*/
+    private List<Task> getList(State state, int userId) {
+        return mTaskDB.taskDao().getList(state, userId);
+    }
 
 
     public Task get(Task task) {
-        String selection = TaskDBSchema.TaskTable.COLS.UUID + "=? and "+TaskDBSchema.TaskTable.COLS.USER_ID+"=?";
-        String[] selectionArgs = new String[]{task.getUUID().toString(),String.valueOf(mUserId)};
-        TaskCursorWrapper cursor = queryTasks(selection, selectionArgs);
-        if (cursor == null || cursor.getCount() == 0)
-            return null;
-        try {
-            cursor.moveToFirst();
-            return cursor.getTask();
-        } finally {
-            cursor.close();
-        }
+        return mTaskDB.taskDao().get(task.getId(), task.getUserId());
     }
 
-    private TaskCursorWrapper queryTasks(String selection, String[] selectionArgs) {
-        Cursor cursor = mDatabase.query(TaskDBSchema.TaskTable.NAME,
-                null,
-                selection,
-                selectionArgs,
-                null,
-                null,
-                null);
-
-        TaskCursorWrapper taskCursorWrapper = new TaskCursorWrapper(cursor);
-        return taskCursorWrapper;
-    }
 
     //Update one
     public void update(Task task) {
-        ContentValues values = getTaskContentValue(task);
-        String where = TaskDBSchema.TaskTable.COLS.UUID + "=? and "+TaskDBSchema.TaskTable.COLS.USER_ID+"=?";
-        String[] whereArgs = new String[]{task.getUUID().toString(),String.valueOf(mUserId)};
-        
-        Task task1 = get(task);
-        if (task1 == null) {
-            mDatabase.insert(TaskDBSchema.TaskTable.NAME, null, values);
-        } else {
-            mDatabase.update(TaskDBSchema.TaskTable.NAME, values, where, whereArgs);
-        }
-        mTasksTodo = getListFromDatabase(State.TODO);
-        mTasksDoing = getListFromDatabase(State.DOING);
-        mTasksDone = getListFromDatabase(State.DONE);
+        mTaskDB.taskDao().update(task);
     }
 
-
-
-/*
     //Delete
-    @Override
-    public void delete(Crime crime) {
-        String where = COLS.UUID + "=?";
-        String[] whereArgs = new String[]{crime.getId().toString()};
-        mDatabase.delete(CrimeDBSchema.CrimeTable.NAME, where, whereArgs);
+    public void delete(Task task) {
+        mTaskDB.taskDao().delete(task);
     }
 
     //Create: Insert
-    @Override
-    public void insert(Crime crime) {
-        ContentValues values = getCrimeContentValue(crime);
-        mDatabase.insert(CrimeDBSchema.CrimeTable.NAME, null, values);
+    public void insert(Task task) {
+        mTaskDB.taskDao().insert(task);
     }
-
-    //Create: Insert
-    @Override
-    public void insertList(List<Crime> crimes) {
-    }
-
-    @Override
-    public int getPosition(UUID uuid) {
-        List<Crime> crimes = getList();
-        for (int i = 0; i < crimes.size(); i++) {
-            if (crimes.get(i).getId().equals(uuid))
-                return i;
-        }
-
-        return -1;
-    }
-
-    /**
-     * Convert crime pojo to ContentValue
-     * @param crime
-     * @return
-     */
-
-    private ContentValues getTaskContentValue(Task task) {
-        ContentValues values = new ContentValues();
-        values.put(TaskDBSchema.TaskTable.COLS.USER_ID,String.valueOf(task.getUserId()));
-        values.put(TaskDBSchema.TaskTable.COLS.UUID, task.getUUID().toString());
-        values.put(TaskDBSchema.TaskTable.COLS.TITLE, task.getTaskTitle());
-        values.put(TaskDBSchema.TaskTable.COLS.DESCRIPTION, task.getTaskDescription());
-        values.put(TaskDBSchema.TaskTable.COLS.DATE, task.getDate().getTime());
-        values.put(TaskDBSchema.TaskTable.COLS.STATE, task.getTaskState().toString());
-        return values;
-    }
-
+    
 }
