@@ -1,24 +1,14 @@
 package com.example.taskmanager.repository;
 
 
-import android.content.ContentValues;
 import android.content.Context;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
-
 
 import androidx.room.Room;
-import androidx.room.RoomDatabase;
 
-import com.example.taskmanager.database.TaskBaseHelper;
 import com.example.taskmanager.database.TaskDB;
-import com.example.taskmanager.database.TaskDBSchema;
-import com.example.taskmanager.database.cursorwrapper.TaskCursorWrapper;
 import com.example.taskmanager.model.State;
 import com.example.taskmanager.model.Task;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class TaskDBRepository {
@@ -68,5 +58,8 @@ public class TaskDBRepository {
     public void insert(Task task) {
         mTaskDB.taskDao().insert(task);
     }
-    
+
+    public TaskDB getTaskDB() {
+        return mTaskDB;
+    }
 }

@@ -1,12 +1,29 @@
 package com.example.taskmanager.model;
 
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
+
 import java.io.Serializable;
 
+@Entity(tableName = "userTable")
 public class User implements Serializable {
-
-    private String mUserName;
-    private String mPassword;
+    @ColumnInfo(name = "id")
+    @PrimaryKey(autoGenerate = true)
     private int mUserId;
+    @ColumnInfo(name = "userName")
+    private String mUserName;
+    @ColumnInfo(name = "password")
+    private String mPassword;
+
+    public User(String userName, String password) {
+        mUserName = userName;
+        mPassword = password;
+    }
+
+    public User() {
+
+    }
 
 
     public String getUserName() {
@@ -32,12 +49,6 @@ public class User implements Serializable {
     public void setUserId(int userId) {
         mUserId = userId;
     }
-
-    public User( String userName, String password) {
-        mUserName = userName;
-        mPassword = password;
-    }
-
 
     @Override
     public String toString() {

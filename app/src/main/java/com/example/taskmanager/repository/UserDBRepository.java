@@ -1,26 +1,19 @@
 package com.example.taskmanager.repository;
 
-import android.content.ContentValues;
 import android.content.Context;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 
+import androidx.room.Room;
 
-import com.example.taskmanager.database.TaskBaseHelper;
-import com.example.taskmanager.database.TaskDBSchema;
-import com.example.taskmanager.database.cursorwrapper.UserCursorWrapper;
+import com.example.taskmanager.database.TaskDB;
 import com.example.taskmanager.model.User;
 
-import java.util.List;
 
 public class UserDBRepository {
 
     private static UserDBRepository sUserRepository;
-
-    //future referenced: memory leaks
     private static Context mContext;
 
-    private SQLiteDatabase mDatabase;
+    private TaskDB mTaskDB;
 
     public static UserDBRepository getInstance(Context context) {
         mContext = context.getApplicationContext();
@@ -31,80 +24,24 @@ public class UserDBRepository {
     }
 
     private UserDBRepository() {
-        TaskBaseHelper crimeBaseHelper = new TaskBaseHelper(mContext);
-        mDatabase = crimeBaseHelper.getWritableDatabase();
+        mTaskDB = Room.databaseBuilder(mContext, TaskDB.class, "TaskDB.db")
+                .allowMainThreadQueries()
+                .build();
     }
-
-
-
-    public List<User> getList() {
-        return null;
-    }
-
-
-    public User get(String userName) {
-        String selection = TaskDBSchema.UserTable.COLS.USER_NAME + "=?";
-        String[] selectionArgs = new String[]{userName};
-        UserCursorWrapper cursor = queryUsers(selection, selectionArgs);
-        try {
-            cursor.moveToFirst();
-            if (!cursor.isAfterLast()) {
-                return cursor.getUser();
-            }
-            return null;
-        } finally {
-            cursor.close();
-        }
-    }
-
-    private UserCursorWrapper queryUsers(String selection, String[] selectionArgs) {
-        Cursor cursor = mDatabase.query(TaskDBSchema.UserTable.NAME,
-                null,
-                selection,
-                selectionArgs,
-                null,
-                null,
-                null);
-        UserCursorWrapper userCursorWrapper = new UserCursorWrapper(cursor);
-        return userCursorWrapper;
-    }
-
-
-    public void update(User user) {
-        ContentValues values = getUserContentValue(user);
-        String where = TaskDBSchema.UserTable.COLS.USER_NAME + "=?";
-        String[] whereArgs = new String[]{user.getUserName()};
-        mDatabase.update(TaskDBSchema.UserTable.NAME, values, where, whereArgs);
-    }
-
-
-    public void delete(User user) {
-        String where = TaskDBSchema.UserTable.COLS.USER_NAME + "=?";
-        String[] whereArgs = new String[]{user.getUserName()};
-        mDatabase.delete(TaskDBSchema.UserTable.NAME, where, whereArgs);
-    }
-
 
     public void insert(User user) {
-        ContentValues values = getUserContentValue(user);
-        mDatabase.insert(TaskDBSchema.UserTable.NAME, null, values);
+        mTaskDB.userDao().insert(user);
     }
 
-
-
-    public void insertList(List<User> users) {
+    public User get(String userName) {
+        return mTaskDB.userDao().get(userName);
     }
 
-
-    public int getPosition(String userName) {
-        return -1;
+    public void update(User user) {
+        mTaskDB.userDao().update(user);
     }
 
-
-    private ContentValues getUserContentValue(User user) {
-        ContentValues values = new ContentValues();
-        values.put(TaskDBSchema.UserTable.COLS.USER_NAME, user.getUserName());
-        values.put(TaskDBSchema.UserTable.COLS.PASSWORD, user.getPassword());
-        return values;
+    public void delete(User user) {
+        mTaskDB.userDao().delete(user);
     }
 }
