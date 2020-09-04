@@ -16,6 +16,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.taskmanager.R;
 import com.example.taskmanager.model.User;
 import com.example.taskmanager.repository.UserDBRepository;
+import com.google.android.material.textfield.TextInputLayout;
 
 
 public class LoginActivity extends AppCompatActivity {
@@ -24,10 +25,13 @@ public class LoginActivity extends AppCompatActivity {
     public static final String KEY_PASSWORD = "password";
     public static final int REQUEST_CODE_SIGN_UP = 0;
     public static final String TAG = "bashir_LA";
+
     private EditText mEditTextUserName;
     private EditText mEditTextPassword;
     private Button mButtonLogin;
     private Button mButtonSignUp;
+    private TextInputLayout mTextInputLayoutUserName;
+    private TextInputLayout mTextInputLayoutPassword;
 
     private UserDBRepository mUserDBRepository;
 
@@ -59,8 +63,10 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void findViews() {
-        mEditTextUserName = findViewById(R.id.editTextUserName);
-        mEditTextPassword = findViewById(R.id.editTextPassword);
+        mTextInputLayoutUserName = findViewById(R.id.textInputLayoutUserName);
+        mTextInputLayoutPassword = findViewById(R.id.textInputLayoutPassword);
+        mEditTextUserName = mTextInputLayoutUserName.getEditText();
+        mEditTextPassword = mTextInputLayoutPassword.getEditText();
         mButtonLogin = findViewById(R.id.buttonLogin);
         mButtonSignUp = findViewById(R.id.buttonSignUp);
     }

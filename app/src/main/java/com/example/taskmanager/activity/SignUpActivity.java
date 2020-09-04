@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.taskmanager.R;
 import com.example.taskmanager.model.User;
 import com.example.taskmanager.repository.UserDBRepository;
+import com.google.android.material.textfield.TextInputLayout;
 
 
 public class SignUpActivity extends AppCompatActivity {
@@ -19,6 +20,9 @@ public class SignUpActivity extends AppCompatActivity {
     private EditText mEditTextPassword;
     private Button mButtonLogin;
     private Button mButtonSignUp;
+
+    private TextInputLayout mTextInputLayoutUserName;
+    private TextInputLayout mTextInputLayoutPassword;
 
     private UserDBRepository mUserDBRepository;
 
@@ -46,8 +50,10 @@ public class SignUpActivity extends AppCompatActivity {
     }
 
     private void findViews() {
-        mEditTextUserName = findViewById(R.id.editTextUserName);
-        mEditTextPassword = findViewById(R.id.editTextPassword);
+        mTextInputLayoutUserName = findViewById(R.id.textInputLayoutUserName);
+        mTextInputLayoutPassword = findViewById(R.id.textInputLayoutPassword);
+        mEditTextUserName = mTextInputLayoutUserName.getEditText();
+        mEditTextPassword = mTextInputLayoutPassword.getEditText();
         mButtonLogin = findViewById(R.id.buttonLogin);
         mButtonSignUp = findViewById(R.id.buttonSignUp);
     }

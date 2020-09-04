@@ -1,8 +1,6 @@
 package com.example.taskmanager.fragment;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.FragmentManager;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -19,12 +17,10 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.Switch;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 
 
@@ -43,9 +39,10 @@ public class TaskDetailFragment extends Fragment {
     public static final String BUNDLE_TASK = "task";
     public static final String ARG_TASK = "TaskArg";
     public static final String DIALOG_FRAGMENT_TAG = "Dialog";
-    public static final int DATE_PICKER_REQUEST_CODE = 0;
-    public static final int TIME_PICKER_REQUEST_CODE = 1;
-    public static final int IMAGE_PICKER_REQUEST_CODE = 2;
+    public static final String TAG_DIALOG_FRAGMENT_SET_IMAGE = "Dialog";
+    public static final int REQUEST_CODE_DATE_PICKER = 0;
+    public static final int REQUEST_CODE_TIME_PICKER = 1;
+    public static final int REQUEST_CODE_SET_IMAGE = 2;
 
     private Task mTask;
     private TaskDBRepository mRepository;
@@ -200,7 +197,7 @@ public class TaskDetailFragment extends Fragment {
             public void onClick(View view) {
                 DatePickerFragment datePickerFragment = DatePickerFragment.newInstance(mTask.getDate());
                 //create parent-child relations between CrimeDetailFragment-DatePickerFragment
-                datePickerFragment.setTargetFragment(TaskDetailFragment.this, DATE_PICKER_REQUEST_CODE);
+                datePickerFragment.setTargetFragment(TaskDetailFragment.this, REQUEST_CODE_DATE_PICKER);
                 datePickerFragment.show(getFragmentManager(), DIALOG_FRAGMENT_TAG);
             }
         });
@@ -210,7 +207,7 @@ public class TaskDetailFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 TimePickerFragment timePickerFragment = TimePickerFragment.newInstance(mTask.getDate());
-                timePickerFragment.setTargetFragment(TaskDetailFragment.this, TIME_PICKER_REQUEST_CODE);
+                timePickerFragment.setTargetFragment(TaskDetailFragment.this, REQUEST_CODE_TIME_PICKER);
                 timePickerFragment.show(getFragmentManager(), DIALOG_FRAGMENT_TAG);
             }
         });
@@ -254,7 +251,9 @@ public class TaskDetailFragment extends Fragment {
         mButtonSetImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                openGallery();
+                SetImageFragment setImageFragment = SetImageFragment.newInstance();
+                setImageFragment.setTargetFragment(TaskDetailFragment.this, REQUEST_CODE_SET_IMAGE);
+                setImageFragment.show(getFragmentManager(), TAG_DIALOG_FRAGMENT_SET_IMAGE);
             }
         });
     }
@@ -287,28 +286,23 @@ public class TaskDetailFragment extends Fragment {
         //dismiss();
     }
 
-    private void openGallery() {
-        Log.d(TAG,"open gallery");
-        Intent gallery = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI);
-        Intent intent = Intent.createChooser(gallery, null);
-        startActivityForResult(intent, IMAGE_PICKER_REQUEST_CODE);
-    }
+
 
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         if (resultCode != Activity.RESULT_OK || data == null)
             return;
-        if (requestCode == DATE_PICKER_REQUEST_CODE) {
+        if (requestCode == REQUEST_CODE_DATE_PICKER) {
             //get response from intent extra, which is user selected date
             Date userSelectedDate = (Date) data.getSerializableExtra(DatePickerFragment.EXTRA_USER_SELECTED_DATE);
             mTask.setDate(userSelectedDate);
             mButtonDetailDate.setText(DateUtils.getDateWithoutTime(mTask.getDate()));
-        } else if (requestCode == TIME_PICKER_REQUEST_CODE) {
+        } else if (requestCode == REQUEST_CODE_TIME_PICKER) {
             Date userSelectedDate = (Date) data.getSerializableExtra(TimePickerFragment.EXTRA_USER_SELECTED_TIME);
             mTask.setDate(userSelectedDate);
             mButtonDetailTime.setText(DateUtils.getTimeWithoutDate(mTask.getDate()));
-        }else if (requestCode == IMAGE_PICKER_REQUEST_CODE){
+        }else if (requestCode == REQUEST_CODE_SET_IMAGE){
             Uri imageUri = data.getData();
             mImageViewDetail.setImageURI(imageUri);
         }
