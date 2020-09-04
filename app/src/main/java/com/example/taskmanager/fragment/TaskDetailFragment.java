@@ -3,13 +3,16 @@ package com.example.taskmanager.fragment;
 import android.app.Activity;
 import android.app.FragmentManager;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
@@ -25,6 +28,7 @@ import com.example.taskmanager.model.State;
 import com.example.taskmanager.model.Task;
 import com.example.taskmanager.repository.TaskDBRepository;
 import com.example.taskmanager.utils.DateUtils;
+import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.Date;
 
@@ -36,6 +40,7 @@ public class TaskDetailFragment extends DialogFragment {
     public static final String DIALOG_FRAGMENT_TAG = "Dialog";
     public static final int DATE_PICKER_REQUEST_CODE = 0;
     public static final int TIME_PICKER_REQUEST_CODE = 1;
+    public static final int IMAGE_PICKER_REQUEST_CODE = 2;
 
     private Task mTask;
     private TaskDBRepository mRepository;
@@ -53,6 +58,10 @@ public class TaskDetailFragment extends DialogFragment {
     private TextView mTextViewDetailEdit;
     private TextView mTextViewDetailSave;
 
+    private TextInputLayout mTextInputLayoutTitle;
+    private TextInputLayout mTextInputLayoutDescription;
+
+    private ImageView mImageViewDetail;
 
     public TaskDetailFragment() {
         //empty public constructor
@@ -71,7 +80,7 @@ public class TaskDetailFragment extends DialogFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mTask = (Task) getArguments().getSerializable(ARG_TASK);
-        mRepository = TaskDBRepository.getInstance(getActivity(),mTask.getUserId());
+        mRepository = TaskDBRepository.getInstance(getActivity(), mTask.getUserId());
     }
 
     @Override
@@ -101,8 +110,10 @@ public class TaskDetailFragment extends DialogFragment {
     //}
 
     private void findViews(View view) {
-        mEditTextDetailTitle = view.findViewById(R.id.editTextDetailTitle);
-        mEditTextDetailDescription = view.findViewById(R.id.editTextDetailDescription);
+        mTextInputLayoutTitle = view.findViewById(R.id.textInputLayoutTitle);
+        mTextInputLayoutDescription = view.findViewById(R.id.textInputLayoutDescription);
+        mEditTextDetailTitle = mTextInputLayoutTitle.getEditText();
+        mEditTextDetailDescription = mTextInputLayoutDescription.getEditText();
         mButtonDetailDate = view.findViewById(R.id.buttonDetailDate);
         mButtonDetailTime = view.findViewById(R.id.buttonDetailTime);
         mRadioGroup = view.findViewById(R.id.radioGroup);
@@ -113,6 +124,7 @@ public class TaskDetailFragment extends DialogFragment {
         mTextViewDetailCancle = view.findViewById(R.id.textViewDetailCancle);
         mTextViewDetailEdit = view.findViewById(R.id.textViewDetailEdit);
         mTextViewDetailSave = view.findViewById(R.id.textViewDetailSave);
+        mImageViewDetail = view.findViewById(R.id.imageViewDetail);
     }
 
     private void initViews() {
@@ -224,9 +236,9 @@ public class TaskDetailFragment extends DialogFragment {
                 mTask.setTaskTitle(String.valueOf(mEditTextDetailTitle.getText()));
                 mTask.setTaskDescription(String.valueOf(mEditTextDetailDescription.getText()));
 
-                if(mTextViewDetailEdit.getVisibility()==View.GONE || mTextViewDetailEdit.getVisibility()==View.INVISIBLE){
+                if (mTextViewDetailEdit.getVisibility() == View.GONE || mTextViewDetailEdit.getVisibility() == View.INVISIBLE) {
                     mRepository.insert(mTask);
-                }else {
+                } else {
                     mRepository.update(mTask);
                 }
                 //Log.d("bashir","size af add  " +mRepository.getList(mTask.getTaskState()).size());
@@ -234,7 +246,19 @@ public class TaskDetailFragment extends DialogFragment {
                 dismiss();
             }
         });
+        mImageViewDetail.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                openGallery();
+            }
+        });
+    }
 
+    private void openGallery() {
+        Log.d(TAG,"open gallery");
+        Intent gallery = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI);
+        Intent intent = Intent.createChooser(gallery, null);
+        startActivityForResult(intent, IMAGE_PICKER_REQUEST_CODE);
     }
 
     private void setResult() {
@@ -242,7 +266,6 @@ public class TaskDetailFragment extends DialogFragment {
         Intent intent = new Intent();
         fragment.onActivityResult(getTargetRequestCode(), Activity.RESULT_OK, intent);
     }
-
 
 
     @Override
@@ -258,6 +281,9 @@ public class TaskDetailFragment extends DialogFragment {
             Date userSelectedDate = (Date) data.getSerializableExtra(TimePickerFragment.EXTRA_USER_SELECTED_TIME);
             mTask.setDate(userSelectedDate);
             mButtonDetailTime.setText(DateUtils.getTimeWithoutDate(mTask.getDate()));
+        }else if (requestCode == IMAGE_PICKER_REQUEST_CODE){
+            Uri imageUri = data.getData();
+            mImageViewDetail.setImageURI(imageUri);
         }
     }
 

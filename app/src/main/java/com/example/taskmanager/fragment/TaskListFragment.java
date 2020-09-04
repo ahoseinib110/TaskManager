@@ -8,11 +8,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -126,7 +128,6 @@ public class TaskListFragment extends Fragment {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == Activity.RESULT_OK) {
             if (requestCode == DETAIL_PICKER_REQUEST_CODE && data != null) {
-
                 updateUI();
             }
         }
@@ -235,8 +236,9 @@ public class TaskListFragment extends Fragment {
         private TextView mTextViewName;
         private TextView mTextViewDate;
         private Button mButtonCircle;
-        private LinearLayout mRowContainer;
+        private ConstraintLayout mRowContainer;
         private Task mTask;
+        private ImageView mImageViewShare;
 
         public TaskViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -244,12 +246,29 @@ public class TaskListFragment extends Fragment {
             mTextViewDate = itemView.findViewById(R.id.textViewDate);
             mRowContainer = itemView.findViewById(R.id.rowContainer);
             mButtonCircle = itemView.findViewById(R.id.buttonCircle);
+            mImageViewShare = itemView.findViewById(R.id.imageViewShare);
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     TaskDetailFragment taskDetailFragment = TaskDetailFragment.newInstance(mTask);
                     taskDetailFragment.setTargetFragment(TaskListFragment.this, DETAIL_PICKER_REQUEST_CODE);
                     taskDetailFragment.show(getFragmentManager(), DIALOG_FRAGMENT_TAG);
+                }
+            });
+
+            mImageViewShare.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Log.d(TAG,"share clicked");
+                    Intent sendIntent = new Intent();
+                    sendIntent.setAction(Intent.ACTION_SEND);
+                    String value = "Task: "+mTask.getTaskTitle()+"\n"
+                            +"Description: "+mTask.getTaskDescription()+"\n"
+                            +"State: "+String.valueOf(mTask.getTaskState());
+                    sendIntent.putExtra(Intent.EXTRA_TEXT, value);
+                    sendIntent.setType("text/plain");
+                    Intent shareIntent = Intent.createChooser(sendIntent, null);
+                    startActivity(shareIntent);
                 }
             });
         }
