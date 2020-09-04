@@ -1,5 +1,7 @@
 package com.example.taskmanager.model;
 
+import android.net.Uri;
+
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.Ignore;
@@ -25,7 +27,8 @@ public class Task implements Serializable {
     private String mTaskDescription;
     @ColumnInfo(name = "date")
     private Date mDate;
-
+    @ColumnInfo(name = "uri")
+    private String mUri;
 
     public Task(){
 
@@ -93,6 +96,14 @@ public class Task implements Serializable {
         mUserId = userId;
     }
 
+    public String getUri() {
+        return mUri;
+    }
+
+    public void setUri(String uri) {
+        mUri = uri;
+    }
+
     @Override
     public String toString() {
         return "Task{" +
@@ -128,4 +139,5 @@ public class Task implements Serializable {
             return value == null ? null : new Date(value);
         }
     }
+
 }
