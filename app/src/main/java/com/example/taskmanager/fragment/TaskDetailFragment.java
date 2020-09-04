@@ -1,6 +1,7 @@
 package com.example.taskmanager.fragment;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.FragmentManager;
 import android.content.Intent;
 import android.net.Uri;
@@ -8,6 +9,9 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -15,6 +19,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -32,7 +37,7 @@ import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.Date;
 
-public class TaskDetailFragment extends DialogFragment {
+public class TaskDetailFragment extends Fragment {
 
     public static final String TAG = "bashir_TDF";
     public static final String BUNDLE_TASK = "task";
@@ -63,6 +68,8 @@ public class TaskDetailFragment extends DialogFragment {
 
     private ImageView mImageViewDetail;
 
+    private Button mButtonSetImage;
+
     public TaskDetailFragment() {
         //empty public constructor
     }
@@ -79,6 +86,7 @@ public class TaskDetailFragment extends DialogFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
         mTask = (Task) getArguments().getSerializable(ARG_TASK);
         mRepository = TaskDBRepository.getInstance(getActivity(), mTask.getUserId());
     }
@@ -94,6 +102,26 @@ public class TaskDetailFragment extends DialogFragment {
         setListeners();
 
         return view;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_task_detail,menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        int id = item.getItemId();
+        switch (id) {
+            case R.id.menu_item_save:
+                saveTask();
+                return true;
+            case R.id.menu_item_delete:
+                mRepository.delete(mTask);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
 
@@ -125,6 +153,7 @@ public class TaskDetailFragment extends DialogFragment {
         mTextViewDetailEdit = view.findViewById(R.id.textViewDetailEdit);
         mTextViewDetailSave = view.findViewById(R.id.textViewDetailSave);
         mImageViewDetail = view.findViewById(R.id.imageViewDetail);
+        mButtonSetImage = view.findViewById(R.id.buttonSetImage);
     }
 
     private void initViews() {
@@ -189,7 +218,7 @@ public class TaskDetailFragment extends DialogFragment {
         mTextViewDetailCancle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                dismiss();
+                //dismiss();
             }
         });
 
@@ -197,8 +226,7 @@ public class TaskDetailFragment extends DialogFragment {
             @Override
             public void onClick(View v) {
                 mRepository.delete(mTask);
-                setResult();
-                dismiss();
+                //dismiss();
             }
         });
 
@@ -218,35 +246,12 @@ public class TaskDetailFragment extends DialogFragment {
         mTextViewDetailSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                int radioButtonID = mRadioGroup.getCheckedRadioButtonId();
-                View radioButton = mRadioGroup.findViewById(radioButtonID);
-                int idx = mRadioGroup.indexOfChild(radioButton);
-                Log.d("bashir", "index" + idx);
-                switch (idx) {
-                    case 0:
-                        mTask.setTaskState(State.TODO);
-                        break;
-                    case 1:
-                        mTask.setTaskState(State.DOING);
-                        break;
-                    case 2:
-                        mTask.setTaskState(State.DONE);
-                        break;
-                }
-                mTask.setTaskTitle(String.valueOf(mEditTextDetailTitle.getText()));
-                mTask.setTaskDescription(String.valueOf(mEditTextDetailDescription.getText()));
-
-                if (mTextViewDetailEdit.getVisibility() == View.GONE || mTextViewDetailEdit.getVisibility() == View.INVISIBLE) {
-                    mRepository.insert(mTask);
-                } else {
-                    mRepository.update(mTask);
-                }
-                //Log.d("bashir","size af add  " +mRepository.getList(mTask.getTaskState()).size());
-                setResult();
-                dismiss();
+                saveTask();
             }
         });
-        mImageViewDetail.setOnClickListener(new View.OnClickListener() {
+
+
+        mButtonSetImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 openGallery();
@@ -254,17 +259,39 @@ public class TaskDetailFragment extends DialogFragment {
         });
     }
 
+    private void saveTask() {
+        int radioButtonID = mRadioGroup.getCheckedRadioButtonId();
+        View radioButton = mRadioGroup.findViewById(radioButtonID);
+        int idx = mRadioGroup.indexOfChild(radioButton);
+        Log.d("bashir", "index" + idx);
+        switch (idx) {
+            case 0:
+                mTask.setTaskState(State.TODO);
+                break;
+            case 1:
+                mTask.setTaskState(State.DOING);
+                break;
+            case 2:
+                mTask.setTaskState(State.DONE);
+                break;
+        }
+        mTask.setTaskTitle(String.valueOf(mEditTextDetailTitle.getText()));
+        mTask.setTaskDescription(String.valueOf(mEditTextDetailDescription.getText()));
+
+        if (mTextViewDetailEdit.getVisibility() == View.GONE || mTextViewDetailEdit.getVisibility() == View.INVISIBLE) {
+            mRepository.insert(mTask);
+        } else {
+            mRepository.update(mTask);
+        }
+        //Log.d("bashir","size af add  " +mRepository.getList(mTask.getTaskState()).size());
+        //dismiss();
+    }
+
     private void openGallery() {
         Log.d(TAG,"open gallery");
         Intent gallery = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI);
         Intent intent = Intent.createChooser(gallery, null);
         startActivityForResult(intent, IMAGE_PICKER_REQUEST_CODE);
-    }
-
-    private void setResult() {
-        Fragment fragment = getTargetFragment();
-        Intent intent = new Intent();
-        fragment.onActivityResult(getTargetRequestCode(), Activity.RESULT_OK, intent);
     }
 
 

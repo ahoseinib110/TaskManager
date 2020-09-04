@@ -21,6 +21,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 
 import com.example.taskmanager.R;
+import com.example.taskmanager.activity.TaskDetailActivity;
 import com.example.taskmanager.activity.TaskManagerActivity;
 import com.example.taskmanager.model.State;
 import com.example.taskmanager.model.Task;
@@ -250,9 +251,11 @@ public class TaskListFragment extends Fragment {
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    TaskDetailFragment taskDetailFragment = TaskDetailFragment.newInstance(mTask);
-                    taskDetailFragment.setTargetFragment(TaskListFragment.this, DETAIL_PICKER_REQUEST_CODE);
-                    taskDetailFragment.show(getFragmentManager(), DIALOG_FRAGMENT_TAG);
+                    Intent intent = TaskDetailActivity.newIntent(getActivity(),mTask);
+                    startActivity(intent);
+                    //TaskDetailFragment taskDetailFragment = TaskDetailFragment.newInstance(mTask);
+                    //taskDetailFragment.setTargetFragment(TaskListFragment.this, DETAIL_PICKER_REQUEST_CODE);
+                    //taskDetailFragment.show(getFragmentManager(), DIALOG_FRAGMENT_TAG);
                 }
             });
 
@@ -282,8 +285,9 @@ public class TaskListFragment extends Fragment {
             }
             mTextViewName.setText(task.getTaskTitle());
             mTextViewDate.setText(String.valueOf(task.getDate()));
-            mButtonCircle.setText(String.valueOf(task.getTaskTitle().charAt(0)));
-
+            if(!task.getTaskTitle().equals("")){
+                mButtonCircle.setText(String.valueOf(task.getTaskTitle().charAt(0)));
+            }
         }
     }
 }

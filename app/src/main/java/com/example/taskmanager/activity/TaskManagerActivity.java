@@ -88,6 +88,7 @@ public class TaskManagerActivity extends AppCompatActivity {
        mFABAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                /*
                 List<TaskListFragment> taskListFragments = new ArrayList<>();
                 int i=0;
                 while (true){
@@ -110,7 +111,12 @@ public class TaskManagerActivity extends AppCompatActivity {
                 for (TaskListFragment taskListFragment : taskListFragments){
                     taskListFragment.setFABClicked();
                 }
+                */
+                Task task = new Task(mUserId, "", State.TODO);
+                Intent intent = TaskDetailActivity.newIntent(TaskManagerActivity.this,task);
+                startActivityForResult(intent,TaskListFragment.DETAIL_PICKER_REQUEST_CODE);
             }
+
        });
     }
 
