@@ -5,6 +5,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -103,19 +106,6 @@ public class TaskListFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         TaskManagerActivity taskManagerActivity = (TaskManagerActivity) getActivity();
-
-        //taskManagerActivity.mFABAdd.setOnClickListener(new View.OnClickListener() {
-        //    @Override
-        //    public void onClick(View v) {
-        //        Task task = new Task(mUserId, "", State.TODO);
-        //        //mTaskRepository.insert(task);
-        //        Log.d(TAG,mState.toString());
-        //        TaskDetailFragment taskDetailFragment = TaskDetailFragment.newInstance(task);
-        //        taskDetailFragment.setTargetFragment(TaskListFragment.this, DETAIL_PICKER_REQUEST_CODE);
-        //        taskDetailFragment.show(getFragmentManager(), DIALOG_FRAGMENT_TAG);
-        //    }
-        //});
-
         View view = inflater.inflate(R.layout.fragment_task_list, container, false);
         findViews(view);
         mRecyclerViewTasks.setLayoutManager(new LinearLayoutManager(getActivity()));

@@ -4,6 +4,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 
 import androidx.annotation.NonNull;
@@ -66,7 +69,33 @@ public class TaskManagerActivity extends AppCompatActivity {
         }).attach();
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_task_list, menu);
+        MenuItem item = menu.findItem(R.id.menu_item_users);
+        boolean b =false;
+        if(b){
+            item.setVisible(true);
+        }else {
+            item.setVisible(false);
+        }
+        return true;
+    }
 
+
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        int id = item.getItemId();
+        switch (id) {
+            case R.id.menu_item_users:
+                Log.d(TAG,"users item clicked");
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
 
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {

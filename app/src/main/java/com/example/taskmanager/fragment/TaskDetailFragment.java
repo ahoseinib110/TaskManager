@@ -107,13 +107,12 @@ public class TaskDetailFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_task_detail, container, false);
-
         findViews(view);
         initViews();
         setListeners();
-
         return view;
     }
+
 
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
@@ -134,6 +133,7 @@ public class TaskDetailFragment extends Fragment {
                 return super.onOptionsItemSelected(item);
         }
     }
+
 
 
     @Override
