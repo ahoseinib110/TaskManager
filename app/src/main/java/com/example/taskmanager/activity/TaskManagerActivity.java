@@ -23,6 +23,7 @@ import com.example.taskmanager.fragment.TaskListFragment;
 import com.example.taskmanager.model.State;
 import com.example.taskmanager.model.Task;
 import com.example.taskmanager.repository.TaskDBRepository;
+import com.example.taskmanager.repository.UserDBRepository;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
@@ -42,6 +43,7 @@ public class TaskManagerActivity extends AppCompatActivity {
     private int mUserId;
     private ViewPagerTaskAdadapter mViewPagerTaskAdapter;
     private TaskDBRepository mTaskRepository;
+    private UserDBRepository mUserRepository;
 
     public FloatingActionButton mFABAdd;
 
@@ -55,6 +57,7 @@ public class TaskManagerActivity extends AppCompatActivity {
         mUserId = intent.getIntExtra(EXTRA_USER_ID, 0);
         mViewPagerTaskAdapter = new ViewPagerTaskAdadapter(this);
         mTaskRepository = TaskDBRepository.getInstance(this, mUserId);
+        mUserRepository = UserDBRepository.getInstance(this);
         //if (mTaskRepository.getList(State.TODO).size() == 0 && mTaskRepository.getList(State.DOING).size() == 0 && mTaskRepository.getList(State.DONE).size() == 0) {
         //    mTaskRepository.createRandomTaskList(mTasksNumber, mName);
         //}
@@ -74,8 +77,7 @@ public class TaskManagerActivity extends AppCompatActivity {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_task_list, menu);
         MenuItem item = menu.findItem(R.id.menu_item_users);
-        boolean b =false;
-        if(b){
+        if(mUserRepository.get(mUserId).getUserName().equals("admin")){
             item.setVisible(true);
         }else {
             item.setVisible(false);
@@ -91,6 +93,8 @@ public class TaskManagerActivity extends AppCompatActivity {
         switch (id) {
             case R.id.menu_item_users:
                 Log.d(TAG,"users item clicked");
+                Intent intent = new Intent(this,UserListActivity.class);
+                startActivity(intent);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

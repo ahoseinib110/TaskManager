@@ -8,6 +8,8 @@ import androidx.room.Update;
 
 import com.example.taskmanager.model.User;
 
+import java.util.List;
+
 @Dao
 public interface UserDBDao {
     @Insert
@@ -15,6 +17,12 @@ public interface UserDBDao {
 
     @Query("select * from userTable where userName=:userName")
     public User get(String userName);
+
+    @Query("select * from userTable where id=:userId")
+    public User get(int userId);
+
+    @Query("select * from userTable")
+    public List<User> getList();
 
     @Query("select userName from userTable where id=:userId")
     public String getUserName(int userId);

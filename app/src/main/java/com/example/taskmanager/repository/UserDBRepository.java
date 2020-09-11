@@ -7,6 +7,8 @@ import androidx.room.Room;
 import com.example.taskmanager.database.TaskDB;
 import com.example.taskmanager.model.User;
 
+import java.util.List;
+
 
 public class UserDBRepository {
 
@@ -35,6 +37,14 @@ public class UserDBRepository {
 
     public User get(String userName) {
         return mTaskDB.userDao().get(userName);
+    }
+
+    public User get(int userId) {
+        return mTaskDB.userDao().get(userId);
+    }
+
+    public List<User> getList() {
+        return mTaskDB.userDao().getList();
     }
 
     public void update(User user) {
