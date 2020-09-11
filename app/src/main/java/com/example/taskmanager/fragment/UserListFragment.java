@@ -80,9 +80,11 @@ public class UserListFragment extends Fragment {
             mImageViewDelete.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    mUserDBRepository.delete(mUser);
-                    mUserAdapter.setUsers(mUserDBRepository.getList());
-                    mUserAdapter.notifyDataSetChanged();
+                    if(!mUser.getUserName().equals("admin")){
+                        mUserDBRepository.delete(mUser);
+                        mUserAdapter.setUsers(mUserDBRepository.getList());
+                        mUserAdapter.notifyDataSetChanged();
+                    }
                 }
             });
         }
@@ -91,6 +93,9 @@ public class UserListFragment extends Fragment {
             mUser = user;
             mTextViewUserName.setText(user.getUserName());
             mTextViewRegDate.setText("user.getRegDate()");
+            if(user.getUserName().equals("admin")){
+                mImageViewDelete.setVisibility(View.GONE);
+            }
         }
 
     }
