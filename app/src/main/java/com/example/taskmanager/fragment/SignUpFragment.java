@@ -1,10 +1,13 @@
 package com.example.taskmanager.fragment;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,8 +31,9 @@ public class SignUpFragment extends Fragment {
 
     public static final String ARG_USERNAME = "argUserName";
     public static final String ARG_PASSWORD = "argPassword";
+    private static final String TAG = "bashir_SUF";
     private String mUserName;
-    private int mPassword;
+    private String mPassword;
 
     private EditText mEditTextUserName;
     private EditText mEditTextPassword;
@@ -40,15 +44,18 @@ public class SignUpFragment extends Fragment {
     private TextInputLayout mTextInputLayoutPassword;
 
     private UserDBRepository mUserDBRepository;
+
+    private CallBack mCallBack;
+
     public SignUpFragment() {
         // Required empty public constructor
     }
 
-    public static SignUpFragment newInstance(String userName, int Password) {
+    public static SignUpFragment newInstance(String userName, String Password) {
         SignUpFragment fragment = new SignUpFragment();
         Bundle args = new Bundle();
         args.putString(ARG_USERNAME, userName);
-        args.putInt(ARG_PASSWORD, Password);
+        args.putString(ARG_PASSWORD, Password);
         fragment.setArguments(args);
         return fragment;
     }
@@ -58,7 +65,7 @@ public class SignUpFragment extends Fragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             mUserName = getArguments().getString(ARG_USERNAME);
-            mPassword = getArguments().getInt(ARG_PASSWORD);
+            mPassword = getArguments().getString(ARG_PASSWORD);
         }
         mUserDBRepository = UserDBRepository.getInstance(getActivity());
     }
@@ -75,20 +82,27 @@ public class SignUpFragment extends Fragment {
         mButtonSignUp.setWidth(200);
 
 
-        if(mUserName !=null){
+        if (mUserName != null) {
             mEditTextUserName.setText(mUserName);
         }
-        if(mPassword!=-1){
-            mEditTextPassword.setText(String.valueOf(mPassword));
+        if (mPassword != null) {
+            mEditTextPassword.setText(mPassword);
         }
 
         return view;
     }
 
 
-
-
-
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        if (context instanceof CallBack) {
+            mCallBack = (CallBack) context;
+        } else {
+            throw new ClassCastException(context.toString()
+                    + " must implement onCrimeSelected");
+        }
+    }
 
     private void findViews(View view) {
         mTextInputLayoutUserName = view.findViewById(R.id.textInputLayoutUserName);
@@ -105,18 +119,24 @@ public class SignUpFragment extends Fragment {
             public void onClick(View v) {
                 String userName = String.valueOf(mEditTextUserName.getText());
                 String password = String.valueOf(mEditTextPassword.getText());
-                if(!userName.equals("") && !password.equals("")){
-                    User user = new User(userName,password);
+                if (!userName.equals("") && !password.equals("")) {
+                    User user = new User(userName, password);
                     mUserDBRepository.insert(user);
-                    Intent intent = new Intent();
-                    intent.putExtra(LoginFragment.KEY_USER_NAME,userName);
-                    intent.putExtra(LoginFragment.KEY_PASSWORD, Integer.parseInt(password));
+                    Log.d(TAG,"befor callback signup "+userName+"  "+ password);
+                    mCallBack.removeFragment(userName, password,SignUpFragment.this);
+                    //Intent intent = new Intent();
+                    //intent.putExtra(LoginFragment.KEY_USER_NAME,userName);
+                    //intent.putExtra(LoginFragment.KEY_PASSWORD, Integer.parseInt(password));
                     //setResult(RESULT_OK,intent);
                     //finish();
-                }else{
+                } else {
                     Toast.makeText(getActivity(), "please fill request fields", Toast.LENGTH_SHORT).show();
                 }
             }
         });
+    }
+
+    public interface CallBack {
+        public void removeFragment(String userName, String password,Fragment fragment);
     }
 }

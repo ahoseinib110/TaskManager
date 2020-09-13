@@ -1,8 +1,12 @@
 package com.example.taskmanager.fragment;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
@@ -13,8 +17,6 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.taskmanager.R;
-import com.example.taskmanager.activity.SignUpActivity;
-import com.example.taskmanager.activity.TaskManagerActivity;
 import com.example.taskmanager.model.User;
 import com.example.taskmanager.repository.UserDBRepository;
 import com.google.android.material.textfield.TextInputLayout;
@@ -41,17 +43,19 @@ public class LoginFragment extends Fragment {
 
     private UserDBRepository mUserDBRepository;
     private String mUserName;
-    private int mPassword;
+    private String mPassword;
+
+    private CallBack mCallBack;
 
     public LoginFragment() {
         // Required empty public constructor
     }
 
-    public static LoginFragment newInstance(String userName, int password) {
+    public static LoginFragment newInstance(String userName, String password) {
         LoginFragment fragment = new LoginFragment();
         Bundle args = new Bundle();
         args.putString(BOUNDLE_USERNAME, userName);
-        args.putInt(BOUNDLE_PASSWORD, password);
+        args.putString(BOUNDLE_PASSWORD, password);
         fragment.setArguments(args);
         return fragment;
     }
@@ -61,13 +65,7 @@ public class LoginFragment extends Fragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             mUserName = getArguments().getString(BOUNDLE_USERNAME);
-            mPassword = getArguments().getInt(BOUNDLE_PASSWORD, -1);
-            if(mUserName!=null) {
-                mEditTextUserName.setText(mUserName);
-            }
-            if(mPassword!=-1) {
-                mEditTextPassword.setText(String.valueOf(mPassword));
-            }
+            mPassword = getArguments().getString(BOUNDLE_PASSWORD);
         }
         mUserDBRepository = UserDBRepository.getInstance(getActivity());
     }
@@ -77,10 +75,25 @@ public class LoginFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_login, container, false);
-
         findViews(view);
         setOnClickListeners();
+        if(mUserName!=null) {
+            mEditTextUserName.setText(mUserName);
+        }
+        if(mPassword!=null) {
+            mEditTextPassword.setText(mPassword);
+        }
         return view;
+    }
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        if(context instanceof CallBack){
+            mCallBack = (CallBack) context;
+        }else {
+
+        }
     }
 
     private void findViews(View view) {
@@ -105,8 +118,7 @@ public class LoginFragment extends Fragment {
                     if (user != null) {
                         if (Integer.parseInt(user.getPassword()) == Integer.parseInt(password)) {
                             Toast.makeText(getActivity(), "correct", Toast.LENGTH_SHORT).show();
-                            Intent intent = TaskManagerActivity.newIntent(getActivity(), user.getUserId());
-                            startActivity(intent);
+                            mCallBack.startTaskManagerActivity(user.getUserId());
                         } else {
                             Toast.makeText(getActivity(), "user name or password is incorrect!", Toast.LENGTH_SHORT).show();
                         }
@@ -120,14 +132,14 @@ public class LoginFragment extends Fragment {
         mButtonSignUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getActivity(), SignUpActivity.class);
+                String userName = null,password = null;
                 if (!isEmptyUserName()) {
-                    intent.putExtra(KEY_USER_NAME, String.valueOf(mEditTextUserName.getText()));
+                    userName= String.valueOf(mEditTextUserName.getText());
                 }
                 if (!isEmptyPassword()) {
-                    intent.putExtra(KEY_PASSWORD, Integer.parseInt(String.valueOf(mEditTextPassword.getText())));
+                    password = String.valueOf(mEditTextPassword.getText());
                 }
-                startActivityForResult(intent, REQUEST_CODE_SIGN_UP);
+                mCallBack.startSignUpActivity(userName,password);
             }
         });
     }
@@ -145,4 +157,11 @@ public class LoginFragment extends Fragment {
         }
         return false;
     }
+
+    public interface CallBack{
+        public void startSignUpActivity(String userName, String password);
+        public void startTaskManagerActivity(int userId);
+    }
+
+
 }
