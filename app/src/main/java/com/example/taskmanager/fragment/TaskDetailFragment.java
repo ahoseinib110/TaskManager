@@ -1,6 +1,7 @@
 package com.example.taskmanager.fragment;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -81,6 +82,9 @@ public class TaskDetailFragment extends Fragment {
 
     private Button mButtonSetImage;
 
+
+    private CallBack mCallBack;
+
     public TaskDetailFragment() {
         //empty public constructor
     }
@@ -113,6 +117,16 @@ public class TaskDetailFragment extends Fragment {
         return view;
     }
 
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        if(context instanceof CallBack){
+            mCallBack = (CallBack) context;
+        }else {
+            //TODO
+            //throw Exception;
+        }
+    }
 
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
@@ -232,7 +246,7 @@ public class TaskDetailFragment extends Fragment {
         mTextViewDetailCancle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //dismiss();
+                mCallBack.removeTaskDetailFragment(TaskDetailFragment.this);
             }
         });
 
@@ -240,7 +254,7 @@ public class TaskDetailFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 mRepository.delete(mTask);
-                //dismiss();
+                mCallBack.removeTaskDetailFragment(TaskDetailFragment.this);
             }
         });
 
@@ -261,6 +275,7 @@ public class TaskDetailFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 saveTask();
+                mCallBack.removeTaskDetailFragment(TaskDetailFragment.this);
             }
         });
 
@@ -406,7 +421,9 @@ public class TaskDetailFragment extends Fragment {
         }
     }
 
-
+    public interface CallBack{
+        public void removeTaskDetailFragment(Fragment fragment);
+    }
 
     /*void onResultFromDatePicker(Date userPickedDate) {
         mCrime.setDate(userPickedDate);

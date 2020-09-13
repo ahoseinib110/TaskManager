@@ -21,6 +21,8 @@ import com.example.taskmanager.model.User;
 import com.example.taskmanager.repository.UserDBRepository;
 import com.google.android.material.textfield.TextInputLayout;
 
+import java.util.Date;
+
 
 /**
  * A simple {@link Fragment} subclass.
@@ -120,7 +122,7 @@ public class SignUpFragment extends Fragment {
                 String userName = String.valueOf(mEditTextUserName.getText());
                 String password = String.valueOf(mEditTextPassword.getText());
                 if (!userName.equals("") && !password.equals("")) {
-                    User user = new User(userName, password);
+                    User user = new User(userName, password,new Date());
                     mUserDBRepository.insert(user);
                     Log.d(TAG,"befor callback signup "+userName+"  "+ password);
                     mCallBack.removeFragment(userName, password,SignUpFragment.this);

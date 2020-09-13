@@ -16,6 +16,7 @@ import android.widget.TextView;
 import com.example.taskmanager.R;
 import com.example.taskmanager.model.User;
 import com.example.taskmanager.repository.UserDBRepository;
+import com.example.taskmanager.utils.DateUtils;
 
 import java.util.List;
 
@@ -92,7 +93,7 @@ public class UserListFragment extends Fragment {
         public void onBind(User user){
             mUser = user;
             mTextViewUserName.setText(user.getUserName());
-            mTextViewRegDate.setText("user.getRegDate()");
+            mTextViewRegDate.setText(DateUtils.getDateWithoutTime(user.getRegisterDate()));
             if(user.getUserName().equals("admin")){
                 mImageViewDelete.setVisibility(View.GONE);
             }

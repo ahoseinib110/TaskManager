@@ -10,9 +10,11 @@ import android.view.MenuItem;
 import android.view.View;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.adapter.FragmentViewHolder;
 import androidx.viewpager2.widget.ViewPager2;
@@ -106,9 +108,7 @@ public class TaskManagerActivity extends AppCompatActivity {
         super.onSaveInstanceState(outState);
     }
 
-    public void mOnResume() {
-        this.onResume();
-    }
+
 
 
     private void findViews() {
@@ -121,30 +121,6 @@ public class TaskManagerActivity extends AppCompatActivity {
        mFABAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                /*
-                List<TaskListFragment> taskListFragments = new ArrayList<>();
-                int i=0;
-                while (true){
-                    TaskListFragment taskListFragment = (TaskListFragment) getSupportFragmentManager().findFragmentByTag("f" + i);
-                    if(taskListFragment!=null){
-                        taskListFragments.add(taskListFragment);
-                        i++;
-                    }else{
-                        break;
-                    }
-                }
-                Log.d(TAG,taskListFragments.size()+"");
-                TaskListFragment myFragment = taskListFragments.get(mViewPagerTask.getCurrentItem());
-                if(myFragment!=null){
-                    Task task = new Task(mUserId, "", State.TODO);
-                    TaskDetailFragment taskDetailFragment = TaskDetailFragment.newInstance(task);
-                    taskDetailFragment.setTargetFragment(myFragment, TaskListFragment.DETAIL_PICKER_REQUEST_CODE);
-                    taskDetailFragment.show(myFragment.getFragmentManager(), TaskListFragment.DIALOG_FRAGMENT_TAG);
-                }
-                for (TaskListFragment taskListFragment : taskListFragments){
-                    taskListFragment.setFABClicked();
-                }
-                */
                 Task task = new Task(mUserId, "", State.TODO);
                 Intent intent = TaskDetailActivity.newIntent(TaskManagerActivity.this,task);
                 startActivityForResult(intent,TaskListFragment.DETAIL_PICKER_REQUEST_CODE);
@@ -201,4 +177,15 @@ public class TaskManagerActivity extends AppCompatActivity {
         return state;
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(resultCode != RESULT_OK){
+            return;
+        }
+
+        if(requestCode==TaskListFragment.DETAIL_PICKER_REQUEST_CODE){
+            //
+        }
+    }
 }

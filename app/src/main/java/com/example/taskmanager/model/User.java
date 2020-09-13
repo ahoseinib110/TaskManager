@@ -7,6 +7,7 @@ import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 import java.io.Serializable;
+import java.util.Date;
 
 @Entity(tableName = "userTable")
 public class User implements Serializable {
@@ -17,15 +18,18 @@ public class User implements Serializable {
     private String mUserName;
     @ColumnInfo(name = "password")
     private String mPassword;
+    @ColumnInfo(name = "RegisterDate")
+    private Date mRegisterDate;
 
     public User() {
 
     }
 
     @Ignore
-    public User(String userName, String password) {
+    public User(String userName, String password, Date date) {
         mUserName = userName;
         mPassword = password;
+        mRegisterDate = date;
     }
 
 
@@ -53,11 +57,20 @@ public class User implements Serializable {
         mUserId = userId;
     }
 
+    public Date getRegisterDate() {
+        return mRegisterDate;
+    }
+
+    public void setRegisterDate(Date registerDate) {
+        mRegisterDate = registerDate;
+    }
+
     @Override
     public String toString() {
         return "User{" +
-                ", mUserName='" + mUserName + '\'' +
+                "mUserName='" + mUserName + '\'' +
                 ", mPassword='" + mPassword + '\'' +
+                ", mRegisterDate=" + mRegisterDate +
                 '}';
     }
 }
